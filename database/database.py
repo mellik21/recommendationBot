@@ -7,6 +7,19 @@ conn = sqlite3.connect(os.path.realpath(keeper.DB_PATH), check_same_thread=False
 cursor = conn.cursor()
 
 
+def select_by_column(table: str, columns: List[str], column: str, value: int) -> List[Tuple]:
+    columns_joined = ", ".join(columns)
+    cursor.execute(f"SELECT {columns_joined} FROM {table} WHERE {column}={value}")
+    rows = cursor.fetchall()
+    result = []
+    for row in rows:
+        dict_row = {}
+        for index, column in enumerate(columns):
+            dict_row[column] = row[index]
+        result.append(dict_row)
+    return result
+
+
 def update(table: str, column_values: Dict, row_id: int):
     statement = " "
     for key in column_values.keys():

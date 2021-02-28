@@ -1,6 +1,7 @@
 import database.database as db
 import datetime
 from typing import Dict, List, NamedTuple
+import common
 
 """Информация о пользователе"""
 
@@ -32,13 +33,16 @@ class UserStore:
         return users
 
     def _get_user_by_id(self, user_id: str) -> User:
+        """Возвращает пользователя"""
         finded = None
         for user in self._users:
             if user.id == user_id:
                 finded = user
         return finded  #
 
-    def _get_user_by_phone(self, phone: str) -> User:
+    @staticmethod
+    def get_user_by_phone(self, phone: str) -> User:
+        """Поиск пользователя по номеру телефона"""
         finded = None
         for user in self._users:
             if user.phone == phone:
@@ -50,22 +54,22 @@ class UserStore:
 
     @staticmethod
     def add_user(name: str, phone: str) -> User:
-
-        user = UserStore._get_user_by_phone(phone)
+        """Добавление нового пользователя и обновление информации о датах"""
+        user = UserStore.get_user_by_phone(phone)
         if user is not None:
-            db.insert("user", {
-                "time_count": parsed_message.time_count,
-                "created": _get_now_formatted(),
-                "category_codename": category.codename,
-                "raw_text": raw_message
+            db.update("user", {
+                "id": user.id,
+                "name": name,
+                "phone": phone,
+                "registered": user.registered,
+                "last_visit": common.get_now_formatted()
             })
         else:
             db.insert("user", {
-                "time_count": parsed_message.time_count,
-                "created": _get_now_formatted(),
-                "category_codename": category.codename,
-                "raw_text": raw_message
+                "id": phone,
+                "name": name,
+                "phone": phone,
+                "registered": common.get_now_formatted(),
+                "last_visit": common.get_now_formatted()
             })
-
-        return User(id=None,
-                    category_codename=category.codename)
+        return UserStore.get_user_by_phone(phone)

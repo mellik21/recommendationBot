@@ -3,9 +3,21 @@ from typing import Dict, List, Tuple
 import sqlite3
 import constantKeeper as keeper
 
-# code from previous project
 conn = sqlite3.connect(os.path.realpath(keeper.DB_PATH), check_same_thread=False)
 cursor = conn.cursor()
+
+
+def update(table: str, column_values: Dict, row_id: int):
+    statement = " "
+    for key in column_values.keys():
+        statement = ', '.join(key + " = " + "?" * len(column_values[key]))
+
+    cursor.executemany(
+        f"UPDATE {table} "
+        f"SET {statement} "
+        f"WHERE (id = {row_id})",
+        column_values.values())
+    conn.commit()
 
 
 def insert(table: str, column_values: Dict):

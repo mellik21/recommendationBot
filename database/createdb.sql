@@ -15,10 +15,10 @@ create table anime(
     description varchar(255),
     alternative_description varchar(255),
     studio varchar(255),
-    episodes_number varchar(255),
-    episodes_duration varchar(255),
-    score integer
-    picture varchar(255), --путь к файлу на сервере
+    episodes_number integer,
+    episodes_duration integer,
+    score float,
+    picture_path varchar(255), --путь к файлу на сервере
 );
 
 create table genre(

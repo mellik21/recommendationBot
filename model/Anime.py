@@ -19,12 +19,12 @@ class Anime(NamedTuple):
     description: str
     alternative_description: str
     studio: str
-    episodes_number: int
-    episodes_duration: int
-    score: float
+    #  episodes_number: int
+    #  episodes_duration: int
+    rating: float
     picture_path: str
     genres: List[Genre]  # Many-to-many anime_genres
-    names: List[str]  # One-to-many anime_names
+    minor_names: List[str]  # One-to-many anime_names
 
 
 class AnimeStore:

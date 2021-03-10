@@ -7,8 +7,8 @@ import common
 '''Парсинг сайта и формирование anime.csv'''
 
 driver = webdriver.Chrome(keeper.CHROME_DRIVER_PATH)
-rus_names, eng_names, hrefs, genres, ratings, descriptions, alt_descriptions, studios, minor_names, img_paths, pages = \
-    ([] for _ in range(11))
+rus_names, eng_names, hrefs, genres, ratings, descriptions, alt_descriptions, studios, minor_names, img_paths, pages, additional = \
+    ([] for _ in range(12))
 
 
 def initDf():
@@ -21,7 +21,8 @@ def initDf():
                        'Description': descriptions,
                        'Imgs': img_paths,
                        'Studios': studios,
-                       'Minor_names': minor_names})
+                       'Minor_names': minor_names,
+                       'Additional': additional})
     df.to_csv('anime.csv', index=False, encoding='utf-8')
 
 
@@ -37,15 +38,14 @@ def appendDf():
                        'Description': descriptions,
                        'Imgs': img_paths,
                        'Studios': studios,
-                       'Minor_names': minor_names})
+                       'Minor_names': minor_names,
+                       'Additional': additional})
     print("try to write new ", df.shape)
     previous_data = previous_data.append(df, ignore_index=True)
     print("result", previous_data.shape)
     previous_data.to_csv('anime.csv', index=False, encoding='utf-8')
 
-
-PAGES_NUM = 633
-for i in range(51, 61):
+for i in range(1, 11):
     driver.get("https://smotret-anime.online/anime?page=" + str(i))
     parser = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -86,5 +86,8 @@ for i in range(51, 61):
 
         img = p.find('img', attrs={'itemprop': 'contentUrl'})
         common.appendTextOrAttr(img, img_paths, 'src')
+        
+        addition = p.find('div', attrs={'class': 'card-content'}).find('p')
+        common.appendTextOrAttr(addition, additional)
 
 appendDf()

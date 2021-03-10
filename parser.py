@@ -40,9 +40,7 @@ def appendDf():
                        'Studios': studios,
                        'Minor_names': minor_names,
                        'Additional': additional})
-    print("try to write new ", df.shape)
     previous_data = previous_data.append(df, ignore_index=True)
-    print("result", previous_data.shape)
     previous_data.to_csv('anime.csv', index=False, encoding='utf-8')
 
 for i in range(1, 11):

@@ -4,11 +4,11 @@ import pandas as pd
 import constantKeeper as keeper
 import common
 
-'''Парсинг сайта и формирование anime.csv'''
+'''Парсинг сайта и формирование anime._base.csv'''
 
 driver = webdriver.Chrome(keeper.CHROME_DRIVER_PATH)
-rus_names, eng_names, hrefs, genres, ratings, descriptions, alt_descriptions, studios, minor_names, img_paths, pages, additional = \
-    ([] for _ in range(12))
+rus_names, eng_names, hrefs, genres, ratings, descriptions, alt_descriptions, minor_names, img_paths, pages, additional = \
+    ([] for _ in range(11))
 
 
 def initDf():
@@ -19,8 +19,8 @@ def initDf():
                        'Genres': genres,
                        'Rating': ratings,
                        'Description': descriptions,
-                       'Imgs': img_paths,
-                       'Studios': studios,
+                       'Alt_description': alt_descriptions,
+                       'Img': img_paths,
                        'Minor_names': minor_names,
                        'Additional': additional})
     df.to_csv('anime.csv', index=False, encoding='utf-8')
@@ -35,12 +35,23 @@ def appendDf():
                        'Genres': genres,
                        'Rating': ratings,
                        'Description': descriptions,
-                       'Imgs': img_paths,
-                       'Studios': studios,
+                       'Alt_description': alt_descriptions,
+                       'Img': img_paths,
                        'Minor_names': minor_names,
                        'Additional': additional})
     previous_data = previous_data.append(df, ignore_index=True)
     previous_data.to_csv('anime.csv', index=False, encoding='utf-8')
+
+
+def clear():
+    #  del genres[-1]
+    del hrefs[-1]
+    del rus_names[-1]
+    del eng_names[-1]
+
+
+# del pages[-1]
+
 
 def parse(left, right):
     for i in range(left, right):
@@ -60,34 +71,44 @@ def parse(left, right):
 
             '''Переход на страницу фильма для выбора более полной информации'''
             driver.get("https://smotret-anime.online" + href)
-            pages.append(i)
             p = BeautifulSoup(driver.page_source, "html.parser")
-            local_genres, local_descriptions, local_studios = ([] for _ in range(3))
+            rating = p.find('span', attrs={'itemprop': 'ratingValue'})
+
+            if rating is None:
+                clear()
+                continue
+            common.appendTextOrAttr(rating, ratings)
+
+            pages.append(i)
+
+            local_genres = []
             for genre_a in p.findAll('a', attrs={'class': 'm-genres-list__item'}):
-                local_genres.append(genre_a.text)
+                common.appendTextOrAttr(genre_a, local_genres)
             genres.append(local_genres)
 
-            for desc_div in p.findAll('div', attrs={'class': 'm-description-item'}):
-                desc = desc_div.find('div', attrs={'class': 'card-content'})
-                local_descriptions.append(desc.text)
-            descriptions.append(local_descriptions)
-
-            for studio_a in p.findAll('a', attrs={'class': 'm-studios-list_item'}):
-                local_studios.append(studio_a['href'])
-            studios.append(local_studios)
+            descs = p.findAll('div', attrs={'class': 'm-description-item'})
+            desc1 = descs[0].find('div', attrs={'class': 'card-content'}) if len(descs) > 0 else ""
+            desc2 = descs[1].find('div', attrs={'class': 'card-content'}) if len(descs) > 1 else ""
+            descriptions.append(desc1.text if len(descs) > 0 else "")
+            alt_descriptions.append(desc2.text if len(descs) > 1 else "")
 
             local_minor_names = p.find('div', attrs={'class': 'm-minor-titles-list'})
             common.appendTextOrAttr(local_minor_names, minor_names)
 
-            rating = p.find('span', attrs={'itemprop': 'ratingValue'})
-            common.appendTextOrAttr(rating, ratings)
-
             img = p.find('img', attrs={'itemprop': 'contentUrl'})
             common.appendTextOrAttr(img, img_paths, 'src')
 
-            addition = p.find('div', attrs={'class': 'card-content'}).find('p')
-            common.appendTextOrAttr(addition, additional)
-    
-    
-parse(1,11)
+            addition = ""
+            for card in p.findAll('div', attrs={'class': 'card-content'}):
+                cards_p = card.find('p')
+                if cards_p is not None:
+                    addition = cards_p.text
+                    break
+
+            additional.append(addition)
+
+
+parse(1, 2)
 initDf()
+parse(2, 3)
+appendDf()

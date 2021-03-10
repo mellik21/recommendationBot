@@ -87,8 +87,7 @@ def parse(left, right):
 
             addition = p.find('div', attrs={'class': 'card-content'}).find('p')
             common.appendTextOrAttr(addition, additional)
-
-    appendDf()
     
     
 parse(1,11)
+initDf()

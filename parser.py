@@ -28,7 +28,6 @@ def initDf():
 
 def appendDf():
     previous_data = pd.read_csv('anime.csv')
-    print("read prev ", previous_data.shape)
     df = pd.DataFrame({'Page': pages,
                        'Rus_name': rus_names,
                        'Eng_name': eng_names,

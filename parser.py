@@ -44,13 +44,11 @@ def appendDf():
 
 
 def clear():
-    #  del genres[-1]
-    del hrefs[-1]
+    #  del genres[-1]    del hrefs[-1]
     del rus_names[-1]
     del eng_names[-1]
 
 
-# del pages[-1]
 
 
 def parse(left, right):

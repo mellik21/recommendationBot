@@ -4,7 +4,7 @@ import pandas as pd
 import constantKeeper as keeper
 import common
 
-'''Парсинг сайта и формирование anime._base.csv'''
+'''Парсинг сайта и формирование anime.base.csv'''
 
 driver = webdriver.Chrome(keeper.CHROME_DRIVER_PATH)
 rus_names, eng_names, hrefs, genres, ratings, descriptions, alt_descriptions, minor_names, img_paths, pages, additional = \

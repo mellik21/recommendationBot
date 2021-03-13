@@ -65,7 +65,6 @@ def parse(left, right):
 
             a = rus_name.find('a', href=True)
             href = a['href']
-            hrefs.append(href)
 
             '''Переход на страницу фильма для выбора более полной информации'''
             driver.get("https://smotret-anime.online" + href)
@@ -76,7 +75,7 @@ def parse(left, right):
                 clear()
                 continue
             common.appendTextOrAttr(rating, ratings)
-
+            hrefs.append(href)
             pages.append(i)
 
             local_genres = []
@@ -106,7 +105,7 @@ def parse(left, right):
             additional.append(addition)
 
 
-parse(1, 2)
-initDf()
-parse(2, 3)
+#parse(1, 2)
+#initDf()
+parse(71, 81)
 appendDf()

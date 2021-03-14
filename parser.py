@@ -1,14 +1,24 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas as pd
-import constantKeeper as keeper
-import common
+import config as keeper
+import components
 
 '''Парсинг сайта и формирование anime.base.csv'''
 
 driver = webdriver.Chrome(keeper.CHROME_DRIVER_PATH)
 rus_names, eng_names, hrefs, genres, ratings, descriptions, alt_descriptions, minor_names, img_paths, pages, additional = \
     ([] for _ in range(11))
+
+
+def appendTextOrAttr(value, list, attr=None):
+    if value is not None:
+        if attr is not None:
+            list.append(value[attr])
+        else:
+            list.append(value.text)
+    else:
+        list.append("")
 
 
 def initDf():
@@ -27,7 +37,7 @@ def initDf():
 
 
 def appendDf():
-    previous_data = pd.read_csv('anime.csv')
+    previous_data = pd.read_csv('files/anime.csv')
     df = pd.DataFrame({'Page': pages,
                        'Rus_name': rus_names,
                        'Eng_name': eng_names,
@@ -49,8 +59,6 @@ def clear():
     del eng_names[-1]
 
 
-
-
 def parse(left, right):
     for i in range(left, right):
         driver.get("https://smotret-anime.online/anime?page=" + str(i))
@@ -59,9 +67,9 @@ def parse(left, right):
         '''Перебор всех фильмов на текущей странице'''
         for anime_div in parser.findAll('div', attrs={'class': 'col s12 m4 l3'}):
             eng_name = anime_div.find('h4', attrs={'class': 'line-2'})
-            common.appendTextOrAttr(eng_name, eng_names)
+            appendTextOrAttr(eng_name, eng_names)
             rus_name = anime_div.find('h5', attrs={'class': 'line-1'})
-            common.appendTextOrAttr(rus_name, rus_names)
+            appendTextOrAttr(rus_name, rus_names)
 
             a = rus_name.find('a', href=True)
             href = a['href']
@@ -74,13 +82,13 @@ def parse(left, right):
             if rating is None:
                 clear()
                 continue
-            common.appendTextOrAttr(rating, ratings)
+            appendTextOrAttr(rating, ratings)
             hrefs.append(href)
             pages.append(i)
 
             local_genres = []
             for genre_a in p.findAll('a', attrs={'class': 'm-genres-list__item'}):
-                common.appendTextOrAttr(genre_a, local_genres)
+                appendTextOrAttr(genre_a, local_genres)
             genres.append(local_genres)
 
             descs = p.findAll('div', attrs={'class': 'm-description-item'})
@@ -90,10 +98,10 @@ def parse(left, right):
             alt_descriptions.append(desc2.text if len(descs) > 1 else "")
 
             local_minor_names = p.find('div', attrs={'class': 'm-minor-titles-list'})
-            common.appendTextOrAttr(local_minor_names, minor_names)
+            appendTextOrAttr(local_minor_names, minor_names)
 
             img = p.find('img', attrs={'itemprop': 'contentUrl'})
-            common.appendTextOrAttr(img, img_paths, 'src')
+            appendTextOrAttr(img, img_paths, 'src')
 
             addition = ""
             for card in p.findAll('div', attrs={'class': 'card-content'}):
@@ -105,7 +113,7 @@ def parse(left, right):
             additional.append(addition)
 
 
-#parse(1, 2)
-#initDf()
+# parse(1, 2)
+# initDf()
 parse(71, 81)
 appendDf()

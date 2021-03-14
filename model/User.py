@@ -1,7 +1,7 @@
 import database.database as db
 import datetime
 from typing import Dict, List, NamedTuple
-import common
+import components
 
 """Информация о пользователе"""
 
@@ -62,14 +62,14 @@ class UserStore:
                 "name": name,
                 "phone": phone,
                 "registered": user.registered,
-                "last_visit": common.get_now_formatted()
+                "last_visit": components.get_now_formatted()
             })
         else:
             db.insert("user", {
                 "id": phone,
                 "name": name,
                 "phone": phone,
-                "registered": common.get_now_formatted(),
-                "last_visit": common.get_now_formatted()
+                "registered": components.get_now_formatted(),
+                "last_visit": components.get_now_formatted()
             })
         return UserStore.get_user_by_phone(phone)

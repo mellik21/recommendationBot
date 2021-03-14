@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List, Tuple
 import sqlite3
-import constantKeeper as keeper
+import config as keeper
 
 conn = sqlite3.connect(os.path.realpath(keeper.DB_PATH), check_same_thread=False)
 cursor = conn.cursor()

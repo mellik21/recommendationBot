@@ -88,13 +88,9 @@ def _init_db():
     conn.commit()
 
 
-def check_db_exists():
-    cursor.execute("SELECT name FROM sqlite_master "
-                   "WHERE type='table' AND name='category'")
+def executeQuery(s):
+    cursor.execute(s)
     table_exists = cursor.fetchall()
     if table_exists:
+        print('table', 'already exist')
         return
-    _init_db()
-
-
-check_db_exists()

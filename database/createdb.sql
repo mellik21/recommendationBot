@@ -9,15 +9,13 @@ create table user(
 
 create table anime(
     id integer not null primary key,
+    page integer,
     name_rus varchar(255),
     name_eng varchar(255),
     release_date datetime,
     description varchar(255),
     alternative_description varchar(255),
-    studio varchar(255),
-    episodes_number integer,
-    episodes_duration integer,
-    score float,
+    rating float,
     picture_path varchar(255), --путь к файлу на сервере
 );
 
@@ -27,11 +25,24 @@ create table genre(
     name_eng varchar(255)
 );
 
+create table studio(
+    id integer not null primary key,
+    name varchar(255)
+);
+
+
 create table anime_genre(
     anime_id integer not null,
     genre_id integer not null,
     FOREIGN KEY(anime_id) REFERENCES anime(id),
     FOREIGN KEY(genre_id) REFERENCES genre(id)
+);
+
+create table anime_studio(
+    studio_id integer not null,
+    anime_id integer not null,
+    FOREIGN KEY(anime_id) REFERENCES anime(id),
+    FOREIGN KEY(studio_id) REFERENCES studio(id)
 );
 
 create table anime_name(
@@ -53,7 +64,7 @@ create table recommendation(
     id integer not null primary key,
     user_id integer not null,
     anime_id integer not null,
-    score float not null, -- float для точности
+    score float not null,
     FOREIGN KEY(user_id) REFERENCES user(id),
     FOREIGN KEY(anime_id) REFERENCES anime(id)
 );

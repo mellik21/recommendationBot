@@ -4,7 +4,7 @@ from telebot import types
 import components
 from PIL import Image
 
-bot = telebot.TeleBot(keeper.API_TOKEN)
+bot = telebot.AsyncTeleBot(keeper.API_TOKEN)
 defaultMarkup = None
 
 

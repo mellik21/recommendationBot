@@ -1,4 +1,4 @@
-import database.database as db
+import database.db_helper as db
 import datetime
 from typing import Dict, List, NamedTuple
 import components

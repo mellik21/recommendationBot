@@ -1,4 +1,4 @@
-import database.database as db
+import database.db_helper as db
 from typing import List, NamedTuple
 
 """Информация о пользовательской оценке"""

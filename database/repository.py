@@ -1,62 +1,67 @@
 import pandas as pd
 import sqlalchemy as db
+from sqlalchemy.dialects import mysql
 
 import config
 
-engine = db.create_engine('sqlite:///' + config.DB_PATH)
-
+engine = db.create_engine(config.USER_DB_CONF)
 connection = engine.connect()
-metadata = db.MetaData()
 
+metadata = db.MetaData()
 studio = db.Table('studio', metadata, autoload=True, autoload_with=engine)
 anime = db.Table('anime', metadata, autoload=True, autoload_with=engine)
 genre = db.Table('genre', metadata, autoload=True, autoload_with=engine)
+anime_genre = db.Table('anime_genre', metadata, autoload=True, autoload_with=engine)
 
-query = db.select([studio])
-ResultProxy = connection.execute(query)
 
-ResultSet = ResultProxy.fetchall()
-print(ResultSet[:3])
+def drop_table(s):
+    metadata.drop_all(engine, [s], checkfirst=True)
+
+
+def execute(s):
+    return connection.execute(s)
+
+
+def table_names():
+    print(engine.table_names())
+
 
 def load_studios():
     data = pd.read_csv('../files/studios.csv')
-
     for index, row in data.iterrows():
-        query = db.insert(studio).values(id=index, name=row['name'])
-        ResultProxy = connection.execute(query)
-        
+        connection.execute(db.insert(studio).values(id=index, name=row['name']))
+
+
 def load_genres():
     data = pd.read_csv('../files/genres.csv')
-
     for index, row in data.iterrows():
-        query = db.insert(genre).values(id=index, name=row['name'])
-        ResultProxy = connection.execute(query)
-        
-        
+        connection.execute(db.insert(genre).values(id=index, name_rus=row['name']))
+
+
 def load_animes():
-    data = pd.read_csv('../files/cleaned_data.csv')
-    #TODO изменить структуру таблицы -- удалить дату, добавить год, сезон, время года, серию
+    data = pd.read_csv('../files/not_none_cleaned_data.csv')
     for index, row in data.iterrows():
-        query = db.insert(anime).values(id=index, 
-                                        page=row['Page'], 
-                                        name_rus=row['Rus_name'],
-                                        name_eng=row['Eng_name'],
-                                        description=row['Description'],
-                                        alternative_descriptio=row['Alt_description'],
-                                        rating=row['Rating'],
-                                        picture_path=row['Img'],
-                                        year=row['Year'], #integer
-                                        year_season=row['Season'] # создать enum и заодно уточнить что все правильно сохранено
-                                        season=row['Season_name'],
-                                        seria=row['Seria_name']
-                                       )
-        ResultProxy = connection.execute(query)
-        genres_list = row['Genres']
-        for i in range(len(genres_list)):
-            query = select(genre).where(genre.name == genres_list[i])
-            g = connection.execute(query)
-            print(g)
+        query = anime.insert().values(id=index,
+                                      page=row['Page'],
+                                      name_rus=row['Rus_name'],
+                                      name_eng=row['Eng_name'],
+                                      description=row['Description'],
+                                      alt_description=row['Alt_description'],
+                                      rating=row['Rating'],
+                                      picture_path=row['Img'],
+                                      release_year=row['Year'],
+                                      year_season=row['Season'],
+                                      season=row['Season_name'],
+                                      seria=row['Seria_name']
+                                      )
 
-            
-        query = db.insert(anime_genres).values(id=index, name=row['name'])
-        
+        result = connection.execute(query)
+        new_id = result.inserted_primary_key
+        print(new_id)
+        genres = row['Genres'].replace('[', '').replace(']', '')
+        for genre in genres.split(','):
+            query = anime_genre.insert().values(genre_id=int(genre.strip()), anime_id=new_id)
+            connection.execute(query)
+
+
+load_animes()

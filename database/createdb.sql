@@ -12,11 +12,14 @@ create table anime(
     page integer,
     name_rus varchar(255),
     name_eng varchar(255),
-    release_date datetime,
-    description varchar(255),
-    alternative_description varchar(255),
+    description varchar(1000),
+    alternative_description varchar(1000),
     rating float,
-    picture_path varchar(255), --путь к файлу на сервере
+    picture_path varchar(255),
+    release_year integer,
+    year_season varchar(255),
+    season varchar(255),
+    seria varchar(255)
 );
 
 create table genre(
@@ -55,7 +58,7 @@ create table assessment(
     id integer not null primary key,
     user_id integer not null,
     anime_id integer not null,
-    score int not null, --предположительные значения: -1, 0, 1
+    score int not null,
     FOREIGN KEY(user_id) REFERENCES user(id),
     FOREIGN KEY(anime_id) REFERENCES anime(id)
 );

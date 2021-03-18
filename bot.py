@@ -1,8 +1,11 @@
+from random import randrange
 import telebot
 import config as keeper
 from telebot import types
 import components
 from PIL import Image
+import database.repository as rep
+import model.Anime
 
 bot = telebot.AsyncTeleBot(keeper.API_TOKEN)
 defaultMarkup = None
@@ -19,6 +22,10 @@ def welcome(message):
 def text_handler(message):
     if message.chat.type == 'private':
         if message.text == 'Что посмотреть?':
+            rand_anime_id = randrange(1916)
+            rand_anime = rep.get_anime_by_id(rand_anime_id)
+            print(rand_anime)
+
             img = open('files/test.jpg', 'rb')
             bot.send_photo(message.chat.id, img, caption='Представьте что рекомендация работает 1 сезон \n⭐ '
                                                          'рейтинг: 9.2 \n Крыс Реми обладает уникальным вкусом. '

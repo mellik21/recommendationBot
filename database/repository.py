@@ -1,7 +1,8 @@
 import pandas as pd
 import sqlalchemy as db
 from sqlalchemy.dialects import mysql
-
+from model.Anime import Anime
+from model.Genre import Genre
 import config
 
 engine = db.create_engine(config.USER_DB_CONF)
@@ -12,6 +13,47 @@ studio = db.Table('studio', metadata, autoload=True, autoload_with=engine)
 anime = db.Table('anime', metadata, autoload=True, autoload_with=engine)
 genre = db.Table('genre', metadata, autoload=True, autoload_with=engine)
 anime_genre = db.Table('anime_genre', metadata, autoload=True, autoload_with=engine)
+
+
+def get_anime_by_id(id) -> Anime:
+    query = db.select([anime]).where(anime.columns.id == id)
+    result = connection.execute(query)
+    for row in result:
+        #  query = db.select([anime_genre.columns.genre_id, genre.columns.id]).where(anime_genre.columns.anime_id == row['id'])
+        #  query = (anime_genre,genre).filter, genre.columns.id == anime_genre.columns.genre_id))
+     #   result = connection.execute(anime_genre, genre)\
+     #     .filter(anime_genre.genre_id == genre.id)\
+     #       .filter(anime_genre.anime_id == id)\
+      #      .all()
+        result = connection.execute('select fr')
+
+        s_genres = []
+        for r in result:
+            # g = Genre(
+            #       id=r['id'],
+            #      name_rus=r['name_rus'],
+            #      name_eng=""
+            #   )
+            print(r)
+            s_genres.append(r['name_rus'])
+
+        return Anime(
+            id=row['id'],
+            page=row['page'],
+            name_rus=row['name_rus'],
+            name_eng=row['name_eng'],
+            description=row['description'],
+            alt_description=row['alternative_description'],
+            rating=row['rating'],
+            picture_path=row['picture_path'],
+            release_year=row['release_year'],
+            year_season=row['year_season'],
+            season=row['season'],
+            seria=row['seria'],
+            genres=str(s_genres),
+            minor_names="",
+            studio=''
+        )
 
 
 def drop_table(s):
@@ -63,5 +105,4 @@ def load_animes():
             query = anime_genre.insert().values(genre_id=int(genre.strip()), anime_id=new_id)
             connection.execute(query)
 
-
-load_animes()
+    # load_anime_studios()

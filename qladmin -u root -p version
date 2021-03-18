@@ -1,0 +1,22 @@
+[0;1;32m●[0m mysql.service - MySQL Community Server
+   Loaded: loaded (/lib/systemd/system/mysql.service; enabled; vendor preset: enabled)
+   Active: [0;1;32mactive (running)[0m since Wed 2021-03-17 21:40:36 +04; 8min ago
+     Docs: man:mysqld(8)
+           http://dev.mysql.com/doc/refman/en/using-systemd.html
+  Process: 14715 ExecStartPre=/usr/share/mysql-8.0/mysql-systemd-start pre (code=exited, status=0/SUCCESS)
+ Main PID: 14750 (mysqld)
+   Status: "Server is operational"
+    Tasks: 38 (limit: 4915)
+   Memory: 332.5M
+   CGroup: /system.slice/mysql.service
+           └─14750 /usr/sbin/mysqld
+
+мар 17 21:40:35 nastya systemd[1]: Starting MySQL Community Server...
+мар 17 21:40:35 nastya mysqld[14750]: 2021-03-17T17:40:35.954498Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.23) starting as process 14750
+мар 17 21:40:35 nastya mysqld[14750]: 2021-03-17T17:40:35.968390Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+мар 17 21:40:36 nastya mysqld[14750]: 2021-03-17T17:40:36.364817Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+мар 17 21:40:36 nastya mysqld[14750]: 2021-03-17T17:40:36.491997Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+мар 17 21:40:36 nastya mysqld[14750]: 2021-03-17T17:40:36.579517Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+мар 17 21:40:36 nastya mysqld[14750]: 2021-03-17T17:40:36.579916Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+мар 17 21:40:36 nastya mysqld[14750]: 2021-03-17T17:40:36.619569Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.23'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+мар 17 21:40:36 nastya systemd[1]: Started MySQL Community Server.

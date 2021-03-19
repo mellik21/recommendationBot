@@ -1,13 +1,13 @@
 from random import randrange
 import telebot
-import config as keeper
 from telebot import types
 import components
 from PIL import Image
 import database.repository as rep
-import model.Anime
+import requests
+import config
 
-bot = telebot.AsyncTeleBot(keeper.API_TOKEN)
+bot = telebot.AsyncTeleBot(config.API_TOKEN)
 defaultMarkup = None
 
 
@@ -23,21 +23,13 @@ def text_handler(message):
     if message.chat.type == 'private':
         if message.text == 'Что посмотреть?':
             rand_anime_id = randrange(1916)
-            rand_anime = rep.get_anime_by_id(rand_anime_id)
-            print(rand_anime)
+            anime = rep.get_anime_by_id(rand_anime_id)
+            print(anime)
+            print(config.BASE_URL + anime.picture_path)
+            img = Image.open(requests.get(config.BASE_URL + anime.picture_path, stream=True).raw)
 
-            img = open('files/test.jpg', 'rb')
-            bot.send_photo(message.chat.id, img, caption='Представьте что рекомендация работает 1 сезон \n⭐ '
-                                                         'рейтинг: 9.2 \n Крыс Реми обладает уникальным вкусом. '
-                                                         'Он готов рисковать собственной жизнью, чтобы '
-                                                         'посмотреть любимое кулинарное шоу и раздобыть '
-                                                         'какую-нибудь приправку или просто свежий продукт. '
-                                                         'Реми живет со своими сородичами, которые его не '
-                                                         'понимают и не принимают его увлечения кулинарией. '
-                                                         'Когда Реми случайно попадает на кухню шикарного '
-                                                         'ресторана, он решает воспользоваться выпавшим ему '
-                                                         'шансом и проверить свои навыки. '
-                                                         '', reply_markup=components.FILM_MARKUP)
+            text = anime.name_rus + '\n⭐ рейтинг:' + str(anime.rating) + '\n ' + anime.description
+            bot.send_photo(message.chat.id, img, caption=text, reply_markup=components.FILM_MARKUP)
 
         elif message.text == 'Уточнить мои интересы':
             bot.register_next_step_handler(

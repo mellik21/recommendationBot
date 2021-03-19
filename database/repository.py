@@ -1,108 +1,39 @@
-import pandas as pd
-import sqlalchemy as db
-from sqlalchemy.dialects import mysql
-from model.Anime import Anime
-from model.Genre import Genre
-import config
-
-engine = db.create_engine(config.USER_DB_CONF)
-connection = engine.connect()
-
-metadata = db.MetaData()
-studio = db.Table('studio', metadata, autoload=True, autoload_with=engine)
-anime = db.Table('anime', metadata, autoload=True, autoload_with=engine)
-genre = db.Table('genre', metadata, autoload=True, autoload_with=engine)
-anime_genre = db.Table('anime_genre', metadata, autoload=True, autoload_with=engine)
+import database.db_helper as db
+import models
 
 
-def get_anime_by_id(id) -> Anime:
-    query = db.select([anime]).where(anime.columns.id == id)
-    result = connection.execute(query)
-    for row in result:
-        #  query = db.select([anime_genre.columns.genre_id, genre.columns.id]).where(anime_genre.columns.anime_id == row['id'])
-        #  query = (anime_genre,genre).filter, genre.columns.id == anime_genre.columns.genre_id))
-     #   result = connection.execute(anime_genre, genre)\
-     #     .filter(anime_genre.genre_id == genre.id)\
-     #       .filter(anime_genre.anime_id == id)\
-      #      .all()
-        result = connection.execute('select fr')
+def get_anime_by_id(id) -> models.Anime:
+    animes = db.get_by_id("anime", models.anime_columns, id)
+    genres = db.get_genres_by_anime_id(id)
+    s_genres = []
+    for genre in genres:
+        print(genre)
+        s_genres.append(genre[0])
 
-        s_genres = []
-        for r in result:
-            # g = Genre(
-            #       id=r['id'],
-            #      name_rus=r['name_rus'],
-            #      name_eng=""
-            #   )
-            print(r)
-            s_genres.append(r['name_rus'])
-
-        return Anime(
-            id=row['id'],
-            page=row['page'],
-            name_rus=row['name_rus'],
-            name_eng=row['name_eng'],
-            description=row['description'],
-            alt_description=row['alternative_description'],
-            rating=row['rating'],
-            picture_path=row['picture_path'],
-            release_year=row['release_year'],
-            year_season=row['year_season'],
-            season=row['season'],
-            seria=row['seria'],
-            genres=str(s_genres),
-            minor_names="",
-            studio=''
+    finded = None
+    for anime in animes:
+        finded = models.Anime(
+            id=anime[0],  # 'id'
+            page=anime[1],  # 'page'
+            name_rus=anime[2],  # 'name_rus'
+            name_eng=anime[3],  # 'name_eng'
+            description=anime[4],  # 'description'
+            alt_description=anime[5],  # 'alternative_description'
+            rating=anime[6],  # 'rating'
+            picture_path=anime[7],  # 'picture_path'
+            release_year=anime[8],  # 'release_year'
+            year_season=anime[9],  # 'year_season'
+            season=anime[10],  # 'season'
+            seria=anime[11],  # 'seria'
+            genres=s_genres,
+            minor_names=[],
+            studio=[]
         )
 
+    return finded
 
-def drop_table(s):
-    metadata.drop_all(engine, [s], checkfirst=True)
-
-
-def execute(s):
-    return connection.execute(s)
-
-
-def table_names():
-    print(engine.table_names())
-
-
-def load_studios():
-    data = pd.read_csv('../files/studios.csv')
-    for index, row in data.iterrows():
-        connection.execute(db.insert(studio).values(id=index, name=row['name']))
-
-
-def load_genres():
-    data = pd.read_csv('../files/genres.csv')
-    for index, row in data.iterrows():
-        connection.execute(db.insert(genre).values(id=index, name_rus=row['name']))
-
-
-def load_animes():
-    data = pd.read_csv('../files/not_none_cleaned_data.csv')
-    for index, row in data.iterrows():
-        query = anime.insert().values(id=index,
-                                      page=row['Page'],
-                                      name_rus=row['Rus_name'],
-                                      name_eng=row['Eng_name'],
-                                      description=row['Description'],
-                                      alt_description=row['Alt_description'],
-                                      rating=row['Rating'],
-                                      picture_path=row['Img'],
-                                      release_year=row['Year'],
-                                      year_season=row['Season'],
-                                      season=row['Season_name'],
-                                      seria=row['Seria_name']
-                                      )
-
-        result = connection.execute(query)
-        new_id = result.inserted_primary_key
-        print(new_id)
-        genres = row['Genres'].replace('[', '').replace(']', '')
-        for genre in genres.split(','):
-            query = anime_genre.insert().values(genre_id=int(genre.strip()), anime_id=new_id)
-            connection.execute(query)
-
-    # load_anime_studios()
+# cursor.execute(
+#      "select e.id, e.amount, c.name "
+#      "from expense e left join category c "
+#     "on c.codename=e.category_codename "
+#      "order by created desc limit 10")

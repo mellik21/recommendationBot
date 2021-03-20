@@ -7,7 +7,6 @@ def get_anime_by_id(id) -> models.Anime:
     genres = db.get_genres_by_anime_id(id)
     s_genres = []
     for genre in genres:
-        print(genre)
         s_genres.append(genre[0])
 
     finded = None
